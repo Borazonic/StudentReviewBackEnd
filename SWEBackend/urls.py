@@ -16,17 +16,9 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-from StudentFeedbackApp.views import StudentReviewCreate,TeacherListCreate,TeacherDetail,StudentDetail,StudentListCreate,ReviewList,ReviewDetail
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('StudentFeedbackApp.urls')),
-    path('api-auth/', include('rest_framework.urls')), 
-    path('student-review-create/', StudentReviewCreate.as_view(), name='student-review-create'),  # Fixed naming convention and removed redundant comma
-    path('students/', StudentListCreate.as_view(), name='student-list-create'),
-    path('students/<int:pk>/', StudentDetail.as_view(), name='student-detail'),
-    path('teachers/', TeacherListCreate.as_view(), name='teacher-list-create'),
-    path('teachers/<int:pk>/', TeacherDetail.as_view(), name='teacher-detail'),
-    path('reviews/', ReviewList.as_view(), name='review-list'),
-    path('reviews/<int:pk>/', ReviewDetail.as_view(), name='review-detail'),
+
 ]
