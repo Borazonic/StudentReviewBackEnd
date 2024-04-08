@@ -1,23 +1,19 @@
 from rest_framework.views import APIView
-from rest_framework.decorators import api_view
 from rest_framework import generics
 from rest_framework.response import Response
 from rest_framework import status
 from StudentFeedbackApp.models import Student, Teacher, Admin, Review
 from StudentFeedbackApp.serializer import StudentSerializer, TeacherSerializer, AdminSerializer, ReviewSerializer
 from rest_framework.permissions import IsAuthenticated, IsAdminUser, AllowAny
-from django.contrib.auth import authenticate,login,logout
+from django.contrib.auth import authenticate,login
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_exempt
+from django.middleware.csrf import get_token
 
-@api_view(['GET'])
-def get_csrf_token(request):
-    """
-    API endpoint to get CSRF token.
-
-    Permissions:
-        - AllowAny: Anyone can access this endpoint.
-    """
-    csrf_token = csrf.get_token(request)
-    return Response({'csrf_token': csrf_token})
+class CSRFTokenView(APIView):
+    def get(self, request, *args, **kwargs):
+        csrf_token = get_token(request)
+        return Response({'csrf_token': csrf_token})
 class StudentReviewCreate(generics.CreateAPIView):
     """
     API endpoint to allow students to create reviews for existing teachers.
@@ -145,6 +141,8 @@ class UserLogin(APIView):
         else:
             return Response({'message': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
 
+
+@method_decorator(csrf_exempt, name='dispatch')
 class UserSignup(APIView):
     """
     API endpoint to sign up new students.
@@ -166,20 +164,3 @@ class UserSignup(APIView):
             return Response({'message': 'Signup successful'}, status=status.HTTP_201_CREATED)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-class UserLogout(APIView):
-    """
-    API endpoint to log out users.
-
-    Permissions:
-        - IsAuthenticated: Only authenticated users can access this endpoint.
-    """
-    permission_classes = [IsAuthenticated]
-
-    def post(self, request, *args, **kwargs):
-        """
-        Override post method to log out user.
-
-        Logs out the currently authenticated user.
-        """
-        logout(request)
-        return Response({'message': 'Logout successful'}, status=status.HTTP_200_OK)
